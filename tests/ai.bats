@@ -64,6 +64,25 @@ create_mock() {
     [[ "$output" == *"Unknown option: --invalid-option"* ]]
 }
 
+@test "fails when --provider has no value" {
+    run "$PROJECT_ROOT/ai.sh" --provider
+    [ "$status" -ne 0 ]
+}
+
+@test "fails when --model has no value" {
+    run "$PROJECT_ROOT/ai.sh" --model
+    [ "$status" -ne 0 ]
+}
+
+@test "accepts arguments in any order" {
+    export AI_OPENAI_API_KEY="test-key"
+    create_mock "curl" '#!/bin/bash
+echo "{\"choices\":[{\"message\":{\"content\":\"ok\"}}]}"'
+
+    run "$PROJECT_ROOT/ai.sh" --prompt "test" --provider openai --model gpt-4o
+    [ "$status" -eq 0 ]
+}
+
 # =============================================================================
 # Input Methods: Piped Input and Direct Prompts
 # =============================================================================
@@ -169,6 +188,23 @@ echo "Custom model not found" >&2
 exit 1'
 
     run "$PROJECT_ROOT/ai.sh" --provider openai --model gpt-3.5-turbo --prompt "test"
+    [ "$status" -eq 0 ]
+}
+
+@test "openai: respects AI_OPENAI_API_BASE env var" {
+    export AI_OPENAI_API_KEY="test-key"
+    export AI_OPENAI_API_BASE="https://custom-openai.example.com/v1"
+    create_mock "curl" '#!/bin/bash
+for arg in "$@"; do
+    if [[ "$arg" == *"custom-openai.example.com"* ]]; then
+        echo "{\"choices\":[{\"message\":{\"content\":\"custom base ok\"}}]}"
+        exit 0
+    fi
+done
+echo "Custom base not found" >&2
+exit 1'
+
+    run "$PROJECT_ROOT/ai.sh" --provider openai --prompt "test"
     [ "$status" -eq 0 ]
 }
 
