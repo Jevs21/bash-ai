@@ -1,5 +1,7 @@
 # bash-ai
 
+[![Tests](https://github.com/Jevs21/bash-ai/actions/workflows/test.yml/badge.svg)](https://github.com/Jevs21/bash-ai/actions/workflows/test.yml)
+
 A lightweight bash script that provides a unified interface for interacting with multiple AI providers. Route prompts to local models (Ollama), OpenAI, Anthropic, or Claude Code CLI using a single consistent command.
 
 
@@ -72,6 +74,14 @@ echo "What is 2+2?" | ./ai.sh
 | `openai` | `gpt-4o` |
 | `anthropic` | `claude-sonnet-4-20250514` |
 | `claude` | CLI default |
+
+## Testing
+
+Requires [bats-core](https://github.com/bats-core/bats-core): `brew install bats-core` or `apt install bats`
+
+```bash
+bats tests/
+```
 
 ## Example Script
 
