@@ -106,6 +106,42 @@ echo "{\"choices\":[{\"message\":{\"content\":\"ok\"}}]}"'
     [ "$status" -eq 0 ]
 }
 
+@test "direct prompt: handles emojis" {
+    export AI_OPENAI_API_KEY="test-key"
+    create_mock "curl" '#!/bin/bash
+echo "{\"choices\":[{\"message\":{\"content\":\"ok\"}}]}"'
+
+    run "$PROJECT_ROOT/ai.sh" --provider openai --prompt "Hello 👋 World 🌍 Test 🚀"
+    [ "$status" -eq 0 ]
+}
+
+@test "direct prompt: handles escape sequences" {
+    export AI_OPENAI_API_KEY="test-key"
+    create_mock "curl" '#!/bin/bash
+echo "{\"choices\":[{\"message\":{\"content\":\"ok\"}}]}"'
+
+    run "$PROJECT_ROOT/ai.sh" --provider openai --prompt $'Tab:\there Newline:\nend Backslash:\\'
+    [ "$status" -eq 0 ]
+}
+
+@test "direct prompt: handles JSON special characters" {
+    export AI_OPENAI_API_KEY="test-key"
+    create_mock "curl" '#!/bin/bash
+echo "{\"choices\":[{\"message\":{\"content\":\"ok\"}}]}"'
+
+    run "$PROJECT_ROOT/ai.sh" --provider openai --prompt '{"key": "value", "nested": {"a": 1}}'
+    [ "$status" -eq 0 ]
+}
+
+@test "direct prompt: handles backticks and dollar signs" {
+    export AI_OPENAI_API_KEY="test-key"
+    create_mock "curl" '#!/bin/bash
+echo "{\"choices\":[{\"message\":{\"content\":\"ok\"}}]}"'
+
+    run "$PROJECT_ROOT/ai.sh" --provider openai --prompt 'Run `echo $HOME` to see path'
+    [ "$status" -eq 0 ]
+}
+
 @test "piped input: accepts single line from echo" {
     export AI_OPENAI_API_KEY="test-key"
     create_mock "curl" '#!/bin/bash
