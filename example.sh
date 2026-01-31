@@ -19,7 +19,7 @@ Transaction: "
 [[ ! -x "$AI_CMD" ]] && { echo "Error: ai.sh not found at $AI_CMD"; exit 1; }
 
 CACHE_FILE=$(mktemp)
-trap "rm -f $CACHE_FILE" EXIT
+trap 'rm -f "$CACHE_FILE"' EXIT
 
 cache_get() { grep -F "	$1	" "$CACHE_FILE" 2>/dev/null | cut -f3 || true; }
 cache_set() { printf '%s\t%s\t%s\n' "x" "$1" "$2" >> "$CACHE_FILE"; }
@@ -28,7 +28,7 @@ total=$(grep -c '' "$INPUT_FILE" || echo 0)
 current=0
 hits=0
 
-> "$OUTPUT_FILE"
+: > "$OUTPUT_FILE"
 echo "Processing $total lines -> $OUTPUT_FILE"
 
 while IFS= read -r line || [[ -n "$line" ]]; do
